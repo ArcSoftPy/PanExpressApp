@@ -9,6 +9,9 @@ import py.com.arcsoft.panexpress.data.repository.VendedorRepository
 import py.com.arcsoft.panexpress.ui.home.HomeScreen
 import py.com.arcsoft.panexpress.ui.login.LoginScreen
 import py.com.arcsoft.panexpress.ui.splash.SplashScreen
+import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.ui.Modifier
 
 @Composable
 fun NavigationGraph(repository: VendedorRepository) {
@@ -22,7 +25,32 @@ fun NavigationGraph(repository: VendedorRepository) {
             LoginScreen(navController, repository)
         }
         composable(Routes.HOME) {
-            HomeScreen(repository)
+            HomeScreen(navController, repository)
         }
+
+        // Pantallas de sincronización
+        composable(Routes.SYNC) { TextScreen("Sincronizar datos") }
+        composable(Routes.SYNC_CARGAS) { TextScreen("Sincronizar cargas") }
+        composable(Routes.SYNC_CLIENTES) { TextScreen("Sincronizar clientes") }
+
+        // Pantallas de clientes
+        composable(Routes.CLIENTES) { TextScreen("Clientes") }
+        composable(Routes.CLIENTES_AGREGAR) { TextScreen("Agregar cliente") }
+        composable(Routes.CLIENTES_MODIFICAR) { TextScreen("Modificar cliente") }
+
+        // Otras pantallas
+        composable(Routes.VENTAS) { TextScreen("Ventas") }
+        composable(Routes.DEVOLUCIONES) { TextScreen("Devoluciones") }
+        composable(Routes.PRODUCTOS) { TextScreen("Productos") }
+    }
+}
+
+@Composable
+fun TextScreen(text: String) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = androidx.compose.ui.Alignment.Center
+    ) {
+        Text(text)
     }
 }
