@@ -7,6 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import py.com.arcsoft.panexpress.data.repository.VendedorRepository
 import py.com.arcsoft.panexpress.navigation.Routes
@@ -53,12 +54,28 @@ fun LoginScreen(navController: NavController, repository: VendedorRepository) {
                 error = null
                 coroutineScope.launch {
                     try {
-                        repository.loginAndSave(email, documento)
-                        navController.navigate(Routes.HOME) {
-                            popUpTo(Routes.LOGIN) { inclusive = true }
+                        var loggedIn = false
+                        try {
+                            repository.loginAndSave(email, documento) // intenta online
+                            loggedIn = true
+                        } catch (e: Exception) {
+                            // Si falla, intenta offline
+                            if (repository.validateOfflineLogin(email, documento)) {
+                                loggedIn = true
+                            } else {
+                                error = "Credenciales incorrectas o sesión expirada"
+                            }
                         }
-                    } catch (e: Exception) {
-                        error = e.message
+                        if (loggedIn) {
+                            // Si fue offline, actualizar la hora del último login
+                            val vendedor = repository.getVendedor().first()
+                            if (vendedor != null) {
+                                repository.saveLastLoginTime(vendedor.id, System.currentTimeMillis())
+                            }
+                            navController.navigate(Routes.HOME) {
+                                popUpTo(Routes.LOGIN) { inclusive = true }
+                            }
+                        }
                     } finally {
                         loading = false
                     }
@@ -68,7 +85,6 @@ fun LoginScreen(navController: NavController, repository: VendedorRepository) {
         ) {
             Text("Iniciar sesión")
         }
-
 
         if (loading) {
             Spacer(modifier = Modifier.height(20.dp))

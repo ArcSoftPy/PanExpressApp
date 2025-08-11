@@ -14,6 +14,9 @@ interface VendedorDao {
     @Query("SELECT * FROM vendedor LIMIT 1")
     fun getVendedor(): Flow<VendedorEntity?>
 
+    @Query("SELECT * FROM vendedor LIMIT 1")
+    suspend fun getVendedorOnce(): VendedorEntity?
+
     @Query("DELETE FROM vendedor")
     suspend fun deleteAll()
 }

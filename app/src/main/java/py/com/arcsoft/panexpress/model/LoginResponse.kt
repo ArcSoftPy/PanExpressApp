@@ -8,5 +8,6 @@ data class Vendedor(
     val id: Int,
     val nombre: String,
     val email: String,
-    val token: String
+    val token: String,
+    val zona_id: Int
 )

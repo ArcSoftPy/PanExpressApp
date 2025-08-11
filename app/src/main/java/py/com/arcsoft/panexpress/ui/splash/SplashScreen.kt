@@ -20,11 +20,18 @@ fun SplashScreen(navController: NavController, repository: VendedorRepository) {
     }
 
     LaunchedEffect(Unit) {
-        delay(1500) // Simula carga
+        delay(1000)
         val vendedor = repository.getVendedor().first()
         if (vendedor != null) {
-            navController.navigate(Routes.HOME) {
-                popUpTo(Routes.SPLASH) { inclusive = true }
+            val diffMinutes = (System.currentTimeMillis() - vendedor.lastLoginTime) / 60000
+            if (diffMinutes <= 30) {
+                navController.navigate(Routes.HOME) {
+                    popUpTo(Routes.SPLASH) { inclusive = true }
+                }
+            } else {
+                navController.navigate(Routes.LOGIN) {
+                    popUpTo(Routes.SPLASH) { inclusive = true }
+                }
             }
         } else {
             navController.navigate(Routes.LOGIN) {
@@ -32,4 +39,5 @@ fun SplashScreen(navController: NavController, repository: VendedorRepository) {
             }
         }
     }
+
 }

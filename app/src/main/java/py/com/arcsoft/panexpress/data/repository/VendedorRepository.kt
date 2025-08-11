@@ -18,8 +18,30 @@ class VendedorRepository(private val dao: VendedorDao) {
                 id = vendedor.id,
                 nombre = vendedor.nombre,
                 email = vendedor.email,
-                token = vendedor.token
+                token = vendedor.token,
+                zona_id = vendedor.zona_id,
+                documento = documento,
+                lastLoginTime = System.currentTimeMillis()
             )
         )
     }
+
+    suspend fun validateOfflineLogin(email: String, documento: String): Boolean {
+        val vendedor = dao.getVendedorOnce()
+        if (vendedor != null) {
+            val diffMinutes = (System.currentTimeMillis() - vendedor.lastLoginTime) / 60000
+            return vendedor.email == email &&
+                    vendedor.documento == documento &&
+                    diffMinutes <= 30
+        }
+        return false
+    }
+
+    suspend fun saveLastLoginTime(id: Int, time: Long) {
+        val vendedor = dao.getVendedorOnce()
+        if (vendedor != null) {
+            dao.insert(vendedor.copy(lastLoginTime = time))
+        }
+    }
+
 }
